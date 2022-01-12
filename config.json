@@ -1,5 +1,5 @@
 {
-    "client_id": "",
+    "client_id": "379615396990420a9f3c65329eefb5a3",
     "client_secret": "",
-    "redirect_url": ""
+    "redirect_uri": "http://localhost:3000/"
 }
