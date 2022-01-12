@@ -8,7 +8,6 @@ export default function useAuth(code) {
 
     useEffect(() => { 
         if (!code) return;
-        console.log(code)
         axios.post("http://localhost:3001/login/", {
             code,
         }).then(res => {
@@ -32,7 +31,6 @@ export default function useAuth(code) {
                     refreshToken,
                 },
             }).then(res => { 
-                console.log(res)
                 setAccessToken(res.data.accessToken);
                 setExpiresIn(res.data.expiresIn);
             }).catch(err => {
@@ -44,4 +42,6 @@ export default function useAuth(code) {
 
         return () => clearInterval(interval)
     }, [refreshToken, expiresIn])
+
+    return accessToken;
 }

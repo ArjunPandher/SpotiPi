@@ -18,7 +18,9 @@ export default function Dashboard({ code }) {
         spotifyApi.setAccessToken(accessToken);
     }, [accessToken])
 
+    // update search
     useEffect(() => {
+        console.log(`search: ${search} access token: ${accessToken}`)
         if (!search) return setSearchResults([]);
         if (!accessToken) return;
 

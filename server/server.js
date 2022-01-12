@@ -19,7 +19,6 @@ const port = 3001;
 // Request authorization from Spotify Web API 
 app.post('/login', (req, res) => {
   const code = req.body.code
-  console.log(`request code: ${code}`)
   const spotifyApi = new spotifyWebApi({
     redirectUri: CONFIG.redirect_uri,
     clientId: CONFIG.client_id, 
@@ -28,9 +27,9 @@ app.post('/login', (req, res) => {
 
   spotifyApi.authorizationCodeGrant(code).then(data => {
     res.json({
-      accessToken: data.access_token,
-      refreshToken: data.refresh_token,
-      expiresIn: data.expires_in
+      accessToken: data.body.access_token,
+      refreshToken: data.body.refresh_token,
+      expiresIn: data.body.expires_in
     })
   }).catch(err => {
     res.sendStatus(400)
@@ -40,7 +39,6 @@ app.post('/login', (req, res) => {
 // refesh using refresh token
 app.post('/refresh', (req, res) => {
   const refreshToken = req.body.refreshToken;
-  console.log(`request refresh token: ${refreshToken}`)
   const spotifyApi = new SpotifyWebApi({
     redirectUri: CONFIG.redirect_uri,
     clientId: CONFIG.client_id,
