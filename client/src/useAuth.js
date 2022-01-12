@@ -7,18 +7,41 @@ export default function useAuth(code) {
     const [expiresIn, setExpiresIn] = useState();
 
     useEffect(() => { 
+        if (!code) return;
+        console.log(code)
         axios.post("http://localhost:3001/login/", {
             code,
         }).then(res => {
             setAccessToken(res.data.accessToken);
             setRefreshToken(res.data.refreshToken);
             setExpiresIn(res.data.expiresIn);
-            console.log(res.data);
-            // window.history.pushState({}, null, "/");    // cleans up url
+            window.history.pushState({}, null, "/");    // cleans up url
         }).catch(err => {
-            // if token expires, redirect to login page
-            console.log(err)
+            // if error is thrown, return to login page
+            // console.log(err)
             window.location = "/"
         })
     }, [code])
+
+    useEffect(() => {
+        if (!refreshToken || !expiresIn) { return; }
+        const interval = setInterval(() => { 
+            axios.post("http://localhost:3001/refresh/", {
+                method: "POST",
+                body: {
+                    refreshToken,
+                },
+            }).then(res => { 
+                console.log(res)
+                setAccessToken(res.data.accessToken);
+                setExpiresIn(res.data.expiresIn);
+            }).catch(err => {
+                // if error is thrown, return to login page
+                // console.log(err);
+                window.location = "/"
+            })
+        }, (expiresIn - 60) * 1000)
+
+        return () => clearInterval(interval)
+    }, [refreshToken, expiresIn])
 }
