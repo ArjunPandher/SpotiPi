@@ -3,6 +3,7 @@ import useAuth from './useAuth';
 import { Container, Form } from 'react-bootstrap';
 import SpotifyWebApi from 'spotify-web-api-node';
 import PlaylistSearchResult from './PlaylistSearchResult';
+import PlaylistModal from './PlaylistModal';
 
 const spotifyApi = new SpotifyWebApi({
     clientId: "379615396990420a9f3c65329eefb5a3",
@@ -12,6 +13,14 @@ export default function Dashboard({ code }) {
     const accessToken = useAuth(code);
     const [search, setSearch] = useState("");
     const [searchResults, setSearchResults] = useState([]);
+    const [modalShow, setModalShow] = useState(false);
+    const [modalPlaylist, setModalPlaylist] = useState(null);
+
+    function handlePlaylist() {
+        console.log(this.playlist)
+        setModalShow(true);
+        setModalPlaylist(this.playlist);
+    }
 
     // update access token if changed
     useEffect(() => {
@@ -42,6 +51,7 @@ export default function Dashboard({ code }) {
                             title: playlist.name,
                             uri: playlist.uri,
                             cover_url: smallestPlaylistImage.url,
+                            songs: playlist.tracks,
                         }
                     }
                     return {
@@ -50,6 +60,7 @@ export default function Dashboard({ code }) {
                         uri: playlist.uri,
                         // default image
                         cover_url: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
+                        songs: playlist.tracks,
                     }
                 })
             );
@@ -62,12 +73,17 @@ export default function Dashboard({ code }) {
             type="search" 
             placeholder="Search for a playlist" 
             value={search} 
-            onChange={e => setSearch(e.target.value)} 
+            onChange={e => {setSearch(e.target.value); 
+                // console.log(searchResults)
+            }} 
         />
         <div className="flex-grow-1 my-2" style={{overflowY: "auto"}}>
-            {searchResults.map(playlist => (
-                <PlaylistSearchResult playlist={playlist} key={playlist.uri}/>
-            ))}
+            {searchResults.map(playlist => {
+                let playlistObj = {playlist: playlist}
+                return (
+                <PlaylistSearchResult playlist={playlist} handlePlaylist={handlePlaylist.bind(playlistObj)} key={playlist.uri}/>
+            )})}
         </div>
+        <PlaylistModal playlist={modalPlaylist} onHide={() => setModalShow(false)} show={modalShow}/>
     </Container>
 }
