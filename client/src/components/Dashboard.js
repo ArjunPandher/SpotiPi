@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 import { Container, Form } from 'react-bootstrap';
 import SpotifyWebApi from 'spotify-web-api-node';
+import axios from 'axios';
 import PlaylistSearchResult from './PlaylistSearchResult';
 import PlaylistModal from './PlaylistModal';
 import PiChart from './PiChart';
@@ -15,12 +16,22 @@ export default function Dashboard({ code }) {
     const [search, setSearch] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [modalShow, setModalShow] = useState(false);
-    const [modalPlaylist, setModalPlaylist] = useState(null);
+    const [modalGenres, setmodalGenres] = useState(null);
 
     function handlePlaylist(playlist) {
-        console.log(playlist);
         setModalShow(true);
-        setModalPlaylist(playlist);
+        axios.get("http://localhost:3001/genres", {
+            params: {
+                accessToken: accessToken,
+                tracks: playlist.songs.href,
+            }
+        }).then(res => {
+            console.log(res.data);
+            setmodalGenres(res.data);
+            // setModalShow(true);
+        }).catch(err => {
+            console.log(err);
+        });
     }
 
     // update access token if changed
@@ -85,8 +96,8 @@ export default function Dashboard({ code }) {
                 <PlaylistSearchResult playlist={playlist} handlePlaylist={handlePlaylist} key={playlist.uri}/>)})
             }
             {
-                searchResults.length === 0 && modalPlaylist !== null && (
-                    <PiChart playlist={modalPlaylist}/>
+                searchResults.length === 0 && modalGenres !== null && (
+                    <PiChart genres={modalGenres}/>
                 )
             }
         </div>

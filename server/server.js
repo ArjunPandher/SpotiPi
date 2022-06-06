@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const spotifyWebApi = require('spotify-web-api-node');
 const CONFIG = require('../config.json');
+const axios = require('axios');
 
 const app = express();
 // app.use(function(req, res, next) {
@@ -39,7 +40,7 @@ app.post('/login', (req, res) => {
 // refesh using refresh token
 app.post('/refresh', (req, res) => {
   const refreshToken = req.body.refreshToken;
-  const spotifyApi = new SpotifyWebApi({
+  const spotifyApi = new spotifyWebApi({
     redirectUri: CONFIG.redirect_uri,
     clientId: CONFIG.client_id,
     clientSecret: CONFIG.client_secret,
@@ -56,6 +57,63 @@ app.post('/refresh', (req, res) => {
       res.sendStatus(400);
     }
   );
+})
+
+app.get('/genres', (req, res) => {
+  const href = req.query.tracks;
+  const accessToken = req.query.accessToken;
+  axios.get(href, {
+    params: {access_token: accessToken},
+  }).then((response) => {
+    // spotify API only supports up to 50 artists at one time, and we only get the primary artist of each track
+    const artistList = response.data.items.slice(0, 50).map(( item ) => item.track.artists[0].id);
+    const artistString = artistList.join(',');
+    
+    axios.get("https://api.spotify.com/v1/artists", {
+      params: {
+        access_token: accessToken,
+        ids: artistString,
+      },
+    }).then((response2) => {
+      const genre_map = {};
+
+      let count = 0;
+
+      response2.data.artists.forEach((item, index) => {
+        let genre = item.genres[0]; // only taking primary genre of each artist
+        for (genre in item.genres) {
+          if (genre != "undefined") {
+            if (genre_map[genre]) {
+              genre_map[genre] += 1;
+            } else {
+              genre_map[genre] = 1;
+            }
+            count++;
+            break;
+          }
+        }
+      });
+
+      const dataset = [];
+      Object.keys(genre_map).forEach((key) => {
+        dataset.push({ name: key, count: genre_map[key], percentage: (Math.round(genre_map[key]/count * 100) / 100).toString() + "%" });
+      });
+
+      console.log(dataset);
+
+      res.json(dataset);
+    }).catch((err) => {
+      console.log(err.response);
+    })
+  }).catch((err) => {
+    console.log(err.response);
+  });
+})
+
+app.get('/genres', (req, res) => {
+  const href = req.query.genres;
+
+  const accessToekn = req.query
 })
 
 app.get('/test', (req, res) => {
