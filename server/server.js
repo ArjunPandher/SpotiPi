@@ -80,23 +80,21 @@ app.get('/genres', (req, res) => {
       let count = 0;
 
       response2.data.artists.forEach((item, index) => {
-        let genre = item.genres[0]; // only taking primary genre of each artist
-        for (genre in item.genres) {
-          if (genre != "undefined") {
-            if (genre_map[genre]) {
-              genre_map[genre] += 1;
-            } else {
-              genre_map[genre] = 1;
-            }
-            count++;
-            break;
+        for (let i = 0; i < item.genres.length; i++) {
+          let genre = item.genres[i];
+          if (genre_map[genre]) {
+            genre_map[genre] += 1;
+          } else {
+            genre_map[genre] = 1;
           }
+          count++;
+          break; // only taking primary genre of each artist
         }
       });
 
       const dataset = [];
       Object.keys(genre_map).forEach((key) => {
-        dataset.push({ name: key, count: genre_map[key], percentage: (Math.round(genre_map[key]/count * 100) / 100).toString() + "%" });
+        dataset.push({ name: key, count: genre_map[key], percentage: (Math.round(genre_map[key]/count * 10000) / 100).toString() + "%" });
       });
 
       console.log(dataset);
