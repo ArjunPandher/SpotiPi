@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
+import useModal from '../hooks/useModal';
 import { Container, Form } from 'react-bootstrap';
 import SpotifyWebApi from 'spotify-web-api-node';
 import axios from 'axios';
 import PlaylistSearchResult from './PlaylistSearchResult';
 import PlaylistModal from './PlaylistModal';
-import PiChart from './PiChart';
 
 const spotifyApi = new SpotifyWebApi({
     clientId: "379615396990420a9f3c65329eefb5a3",
@@ -15,20 +15,28 @@ export default function Dashboard({ code }) {
     const accessToken = useAuth(code);
     const [search, setSearch] = useState("");
     const [searchResults, setSearchResults] = useState([]);
-    const [modalShow, setModalShow] = useState(false);
-    const [modalGenres, setmodalGenres] = useState(null);
+    const [playlistInfo, setPlaylistInfo] = useState(null);
+    const [show, setShow] = useState(false);
 
     function handlePlaylist(playlist) {
-        setModalShow(true);
+
+        console.log(playlist);
+
         axios.get("http://localhost:3001/genres", {
             params: {
                 accessToken: accessToken,
                 tracks: playlist.songs.href,
             }
         }).then(res => {
-            console.log(res.data);
-            setmodalGenres(res.data);
-            // setModalShow(true);
+            setPlaylistInfo(
+                {
+                    title: playlist.title,
+                    owner: playlist.owner,
+                    image_url: playlist.cover_url,
+                    genre_info: res.data
+                }
+            );
+            setShow(true);
         }).catch(err => {
             console.log(err);
         });
@@ -81,6 +89,7 @@ export default function Dashboard({ code }) {
     }, [search, accessToken])
 
     return <Container className="d-flex flex-column py-2" style={{ height: "100vh" }}>
+        { show ? <PlaylistModal show={show} setShow={setShow} playlistInfo={playlistInfo}></PlaylistModal> : null }
         <Form.Control
             type="search" 
             placeholder="Search for a playlist" 
@@ -94,11 +103,6 @@ export default function Dashboard({ code }) {
             searchResults.map(playlist => {
                 return (
                 <PlaylistSearchResult playlist={playlist} handlePlaylist={handlePlaylist} key={playlist.uri}/>)})
-            }
-            {
-                searchResults.length === 0 && modalGenres !== null && (
-                    <PiChart genres={modalGenres}/>
-                )
             }
         </div>
     </Container>

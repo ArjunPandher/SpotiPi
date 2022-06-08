@@ -8,7 +8,7 @@ function PiChart(genres) {
     const dimensions = {
         width: 600,
         height: 600,
-        margin: {top: 30, bottom: 30, right: 30, left: 60},
+        margin: {top: 0, bottom: 0, right: 0, left: 0},
       };
     
     let data = genres.genres;
@@ -24,13 +24,12 @@ function PiChart(genres) {
             const outerRadius = Math.min(width, height) / 2;
             const labelRadius = outerRadius * 0.8 + innerRadius * 0.2;
 
-            let names = d3.map(data, (d) => { return d.name });
+            const names = d3.map(data, (d) => { return d.name });
+            const counts = d3.map(data, (d) => { return d.count });
             const percentages = d3.map(data, (d) => { return d.percentage });
             const interval = d3.range(names.length);
 
-            console.log(names);
-
-            let namesSet = new InternSet(names);
+            const namesSet = new InternSet(names);
 
             let colors = undefined;
 
@@ -41,7 +40,7 @@ function PiChart(genres) {
 
             const title = i => `${names[i]}\n${percentages[i]}`;
 
-            const arcs = d3.pie().padAngle(0).sort(null).value(i => percentages[i])(interval);
+            const arcs = d3.pie().padAngle(0).sort(null).value(i => counts[i])(interval);
             const arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius);
             const arcLabel = d3.arc().innerRadius(labelRadius).outerRadius(labelRadius);
 
@@ -76,7 +75,7 @@ function PiChart(genres) {
               .selectAll("tspan")
               .data(d => {
                 const lines = `${title(d.data)}`.split(/\n/);
-                return (d.endAngle - d.startAngle) > 0.1 ? lines : lines.slice(0, 1);
+                return (d.endAngle - d.startAngle) > 0.25 ? lines : lines.slice(0, 1);
               })
               .join("tspan")
                 .attr("x", 0)

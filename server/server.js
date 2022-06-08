@@ -94,7 +94,7 @@ app.get('/genres', (req, res) => {
 
       const dataset = [];
       Object.keys(genre_map).forEach((key) => {
-        dataset.push({ name: key, count: genre_map[key], percentage: (Math.round(genre_map[key]/count * 10000) / 100).toString() + "%" });
+        dataset.push({ name: key, count: genre_map[key], percentage: Math.round(genre_map[key]/count * 10000) / 100 });
       });
 
       console.log(dataset);
