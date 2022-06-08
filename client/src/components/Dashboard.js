@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
-import useModal from '../hooks/useModal';
 import { Container, Form } from 'react-bootstrap';
 import SpotifyWebApi from 'spotify-web-api-node';
 import axios from 'axios';
