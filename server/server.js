@@ -114,13 +114,6 @@ app.get('/genres', (req, res) => {
   const accessToekn = req.query
 })
 
-app.get('/test', (req, res) => {
-  console.log("BRUH")
-  res.json({
-    text: "bruh lmao"
-  })
-})
-
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
