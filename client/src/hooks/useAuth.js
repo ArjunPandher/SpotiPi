@@ -11,13 +11,14 @@ export default function useAuth(code) {
         axios.post("http://localhost:3001/login/", {
             code,
         }).then(res => {
+            console.log(res)
             setAccessToken(res.data.accessToken);
             setRefreshToken(res.data.refreshToken);
             setExpiresIn(res.data.expiresIn);
             window.history.pushState({}, null, "/");    // cleans up url
         }).catch(err => {
             // if error is thrown, return to login page
-            // console.log(err)
+            console.log(err)
             window.location = "/"
         })
     }, [code])
