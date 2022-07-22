@@ -8,7 +8,9 @@ First, run `npm install` in both the `client` and `server` directories.
 Then, create your .env files in both the `client` and `server` in the format shown below:
 
 CLIENT_ID = "client ID here"
+
 CLIENT_SECRET = "client secret here"
+
 REDIRECT_URI = "http://localhost:3000/"
 
 To get this app working on your local machine, you must create an app through Spotify's Developer Console, and add "http://localhost:3000/" to your project's redirect URIs. See [here](https://spotify.dev/documentation/web-api/quick-start/) for more info.
